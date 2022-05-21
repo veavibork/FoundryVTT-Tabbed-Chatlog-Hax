@@ -1,11 +1,11 @@
 {
-	"name": "tabbed-chatlog",
-	"title": "Tabbed Chatlog",
-	"description": "Splits the Chatlog into In Character (per scene), Rolls (per scene), and Out of Character (global).",
+	"name": "tabbed-chatlog-hax",
+	"title": "Tabbed Chatlog Hax",
+	"description": "Splits the Chatlog into GET THE HELL OUT OF HERE JC",
 	"version": "1.6.4",
 	"minimumCoreVersion": "0.8.0",
 	"compatibleCoreVersion": "9",
-	"author": "Cody Swendrowski <cody@swendrowski.us>",
+	"author": "Veav but actually Cody Swendrowski <cody@swendrowski.us>",
 	"esmodules": [
 		"./tabbed-chatlog.js"
 	],
@@ -45,7 +45,7 @@
 			"path": "languages/ko.json"
 		}
 	],
-	"url": "https://github.com/cswendrowski/FoundryVTT-tabbed-chatlog",
-	"manifest": "https://github.com/cswendrowski/FoundryVTT-tabbed-chatlog/releases/download/latest/module.json",
-	"download": "https://github.com/cswendrowski/FoundryVTT-tabbed-chatlog/releases/download/1.6.4/module.zip"
+	"url": "https://github.com/veavibork/FoundryVTT-Tabbed-Chatlog-Hax",
+	"manifest": "https://github.com/veavibork/FoundryVTT-Tabbed-Chatlog-Hax/releases/download/latest/module.json",
+	"download": "https://github.com/veavibork/FoundryVTT-Tabbed-Chatlog-Hax/releases/download/1.6.4/module.zip"
 }
