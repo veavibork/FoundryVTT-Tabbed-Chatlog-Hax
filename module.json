@@ -18,31 +18,6 @@
 			"lang": "en",
 			"name": "English",
 			"path": "languages/en.json"
-		},
-		{
-			"lang": "es",
-			"name": "Español",
-			"path": "languages/es.json"
-		},
-		{
-			"lang": "cn",
-			"name": "中文",
-			"path": "languages/cn.json"
-		},
-		{
-			"lang": "zh-tw",
-			"name": "正體中文",
-			"path": "languages/zh-tw.json"
-		},
-		{
-			"lang": "de",
-			"name": "Deutsch",
-			"path": "languages/de.json"
-		},
-		{
-			"lang": "ko",
-			"name": "Korean",
-			"path": "languages/ko.json"
 		}
 	],
 	"url": "https://github.com/veavibork/FoundryVTT-Tabbed-Chatlog-Hax",
