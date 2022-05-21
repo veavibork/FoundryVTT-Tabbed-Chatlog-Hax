@@ -58,10 +58,6 @@ function isMessageVisible(e) {
 
     if (!isMessageTypeVisible(messageType)) return false;
 
-    if (e.data.speaker.scene && game.settings.get("tabbed-chatlog", "perScene")) {
-        if ((messageType == CONST.CHAT_MESSAGE_TYPES.IC || messageType == CONST.CHAT_MESSAGE_TYPES.EMOTE) && (e.data.speaker.scene != game.user.viewedScene)) return false;
-    }
-
     if (e.data.blind && e.data.whisper.find(element => element == game.userId) == undefined) return false;
 
     return true;
@@ -132,21 +128,6 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
 
     html.addClass("type" + data.message.type);
 
-    var sceneMatches = true;
-
-    if (data.message.type == CONST.CHAT_MESSAGE_TYPES.OTHER
-    	|| data.message.type == CONST.CHAT_MESSAGE_TYPES.IC
-		|| data.message.type == CONST.CHAT_MESSAGE_TYPES.EMOTE
-		|| data.message.type == CONST.CHAT_MESSAGE_TYPES.ROLL) {
-        if (data.message.speaker.scene != undefined && game.settings.get("tabbed-chatlog", "perScene")) {
-            html.addClass("scenespecific");
-            html.addClass("scene" + data.message.speaker.scene);
-            if (data.message.speaker.scene != game.user?.viewedScene) {
-                sceneMatches = false;
-            }
-        }
-    }
-
     if (salonEnabled && chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.ROLL) {
         if (!html.hasClass('gm-roll-hidden')) {
             html.css("display", "list-item");
@@ -157,9 +138,9 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
     if (salonEnabled && chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.WHISPER) return;
 
     if (currentTab == "rolls") {
-        if (chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.OTHER && sceneMatches) {
+        if (chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.OTHER ) {
             html.css("display", "list-item");
-        } else if (data.message.type == CONST.CHAT_MESSAGE_TYPES.ROLL && sceneMatches) {
+        } else if (data.message.type == CONST.CHAT_MESSAGE_TYPES.ROLL ) {
             if (!html.hasClass('gm-roll-hidden')) {
                 html.css("display", "list-item");
             }
@@ -187,16 +168,9 @@ Hooks.on("diceSoNiceRollComplete", (id) => {
 });
 
 Hooks.on("createChatMessage", (chatMessage, content) => {
-    var sceneMatches = true;
-
-    if (chatMessage.data.speaker.scene) {
-        if (chatMessage.data.speaker.scene != game.user?.viewedScene) {
-            sceneMatches = false;
-        }
-    }
 
     if (chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.OTHER) {
-        if (currentTab != "rolls" && sceneMatches) {
+        if (currentTab != "rolls" ) {
             if (game.settings.get("tabbed-chatlog", "autoNavigate")) {
                 window.game.tabbedchat.tabs.activate("rolls", {triggerCallback: true});
             }
@@ -206,7 +180,7 @@ Hooks.on("createChatMessage", (chatMessage, content) => {
             }
         }
     } else if (chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.ROLL) {
-        if (currentTab != "rolls" && sceneMatches && chatMessage.data.whisper.length == 0) {
+        if (currentTab != "rolls" && chatMessage.data.whisper.length == 0) {
             if (game.settings.get("tabbed-chatlog", "autoNavigate")) {
                 window.game.tabbedchat.tabs.activate("rolls", {triggerCallback: true});
             }
