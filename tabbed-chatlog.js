@@ -35,29 +35,13 @@ function isMessageTypeVisible(messageType) {
                 case CONST.CHAT_MESSAGE_TYPES.OTHER:
                     return false;
                 case CONST.CHAT_MESSAGE_TYPES.OOC:
-                    return false;
+                    return true;
                 case CONST.CHAT_MESSAGE_TYPES.IC:
                     return true;
                 case CONST.CHAT_MESSAGE_TYPES.EMOTE:
                     return true;
                 case CONST.CHAT_MESSAGE_TYPES.WHISPER:
                     return game.settings.get("tabbed-chatlog", "icWhispers");
-                case CONST.CHAT_MESSAGE_TYPES.ROLL:
-                    return false;
-            }
-            break;
-        case "ooc":
-            switch (messageType) {
-                case CONST.CHAT_MESSAGE_TYPES.OTHER:
-                    return false;
-                case CONST.CHAT_MESSAGE_TYPES.OOC:
-                    return true;
-                case CONST.CHAT_MESSAGE_TYPES.IC:
-                    return false;
-                case CONST.CHAT_MESSAGE_TYPES.EMOTE:
-                    return false;
-                case CONST.CHAT_MESSAGE_TYPES.WHISPER:
-                    return !game.settings.get("tabbed-chatlog", "icWhispers");
                 case CONST.CHAT_MESSAGE_TYPES.ROLL:
                     return false;
             }
@@ -99,7 +83,6 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
     let toPrepend = '<nav class="tabbedchatlog tabs">';
     toPrepend += `<a class="item ic" data-tab="ic">${game.i18n.localize("TC.TABS.IC")}</a><i id="icNotification" class="notification-pip fas fa-exclamation-circle" style="display: none;"></i>`;
     toPrepend += `<a class="item rolls" data-tab="rolls">${game.i18n.localize("TC.TABS.Rolls")}</a><i id="rollsNotification" class="notification-pip fas fa-exclamation-circle" style="display: none;"></i>`;
-    toPrepend += `<a class="item ooc" data-tab="ooc">${game.i18n.localize("TC.TABS.OOC")}</a></nav><i id="oocNotification" class="notification-pip fas fa-exclamation-circle" style="display: none;"></i>`;
     html.prepend(toPrepend);
 
     window.game.tabbedchat = {};
@@ -114,7 +97,6 @@ Hooks.on("renderChatLog", async function (chatLog, html, user) {
             switch (tab) {
                 case "rolls":
                 case "ic":
-                case "ooc":
 
                     setClassVisibility($(".type0"), isMessageTypeVisible(CONST.CHAT_MESSAGE_TYPES.OTHER));
                     setClassVisibility($(".type1"), isMessageTypeVisible(CONST.CHAT_MESSAGE_TYPES.OOC));
@@ -187,18 +169,13 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
         }
     } else if (currentTab == "ic") {
         if ((data.message.type == CONST.CHAT_MESSAGE_TYPES.IC
+		  || data.message.type == CONST.CHAT_MESSAGE_TYPES.OOC
     	  || data.message.type == CONST.CHAT_MESSAGE_TYPES.EMOTE
 		  || (data.message.type == CONST.CHAT_MESSAGE_TYPES.WHISPER && game.settings.get("tabbed-chatlog", "icWhispers"))) && sceneMatches) {
             html.css("display", "list-item");
         } else {
             html.css("cssText", "display: none !important;");
             html.addClass("hardHide");
-        }
-    } else if (currentTab == "ooc") {
-        if (data.message.type == CONST.CHAT_MESSAGE_TYPES.OOC || (data.message.type == CONST.CHAT_MESSAGE_TYPES.WHISPER && !game.settings.get("tabbed-chatlog", "icWhispers"))) {
-            html.css("display", "list-item");
-        } else {
-            html.css("display", "none");
         }
     }
 });
@@ -250,40 +227,14 @@ Hooks.on("createChatMessage", (chatMessage, content) => {
                 $("#icNotification").show();
             }
         }
-    } else {
-        if (salonEnabled && chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.WHISPER && !game.settings.get("tabbed-chatlog", "icWhispers")) return;
-
-        if (currentTab != "ooc") {
-            if (game.settings.get("tabbed-chatlog", "autoNavigate")) {
-                window.game.tabbedchat.tabs.activate("ooc", {triggerCallback: true});
-            }
-            else {
-                setOOCNotifyProperties();
-                $("#oocNotification").show();
-            }
-        }
     }
 });
 
 Hooks.on("preCreateChatMessage", (chatMessage, content) => {
 
-    if (game.settings.get('tabbed-chatlog', 'icChatInOoc')) {
-        if (currentTab == "ooc") {
-            if (chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.IC) {
-                chatMessage.data._source.type = CONST.CHAT_MESSAGE_TYPES.OOC;
-                chatMessage.data.type = CONST.CHAT_MESSAGE_TYPES.OOC;
-                content.type = CONST.CHAT_MESSAGE_TYPES.OOC
-                delete (content.speaker);
-                delete (chatMessage.data.speaker);
-                delete (chatMessage.data._source.speaker);
-                console.log(chatMessage);
-            }
-        }
-    }
-
     if (chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.OTHER || chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.ROLL) {
 
-    } else if (chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.IC || chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.EMOTE) {
+    } else if (chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.OOC || chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.IC || chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.EMOTE) {
         try {
             let scene = game.scenes.get(chatMessage.data.speaker.scene);
             let webhook = scene.getFlag("tabbed-chatlog", "webhook");
@@ -300,7 +251,10 @@ Hooks.on("preCreateChatMessage", (chatMessage, content) => {
             var actor = loadActorForChatMessage(speaker);
             let img = "";
             let name = "";
-            if (actor) {
+            if (chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.OOC) {
+				img = game.users.get(chatMessage.user.id).avatar;
+				name = game.users.get(chatMessage.user.id).name;
+			} else if (actor) {
                 img = generatePortraitImageElement(actor);
                 name = actor.name;
             } else {
@@ -322,35 +276,6 @@ Hooks.on("preCreateChatMessage", (chatMessage, content) => {
                 sendToDiscord(webhook, {
                     content: turndown.turndown(message),
                     username: name,
-                    avatar_url: img
-                });
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    } else {
-        try {
-            let webhook = game.settings.get("tabbed-chatlog", "oocWebhook");
-
-            if (webhook == undefined || webhook == "") {
-                return;
-            }
-
-            let img = game.users.get(chatMessage.user.id).avatar;
-            img = game.data.addresses.remote + "/" + img;
-
-            if (!chatMessage.data.whisper?.length) {
-                let message = chatMessage.data.content;
-                if (game.modules.get("polyglot")?.active) {
-                    let lang = chatMessage.data.flags.polyglot.language
-                    const LanguageProvider = polyglot.polyglot.LanguageProvider;
-                    if (lang != LanguageProvider.defaultLanguage) {
-                        message = LanguageProvider.languages[lang] + ": ||" + chatMessage.data.content + "||";
-                    }
-                }
-                sendToDiscord(webhook, {
-                    content: turndown.turndown(message),
-                    username: game.users.get(chatMessage.user.id).name,
                     avatar_url: img
                 });
             }
@@ -500,15 +425,9 @@ function setRollsNotifyProperties() {
     $("#rollsNotification").css({'right': ($("div#sidebar.app").width() / nTabs * (nTabs - 2)).toString() + 'px'});
 };
 
-function setOOCNotifyProperties() {
-    const nTabs = $("nav.tabbedchatlog.tabs > a.item").length;
-    $("#oocNotification").css({'right': ($("div#sidebar.app").width() / nTabs * (nTabs - 3)).toString() + 'px'});
-};
-
 function setALLTabsNotifyProperties() {
     setICNotifyProperties();
     setRollsNotifyProperties();
-    setOOCNotifyProperties();
 }
 
 
@@ -538,15 +457,6 @@ Messages.prototype.flush =
 
 Hooks.on('init', () => {
 
-    game.settings.register('tabbed-chatlog', 'oocWebhook', {
-        name: game.i18n.localize("TC.SETTINGS.OocWebhookName"),
-        hint: game.i18n.localize("TC.SETTINGS.OocWebhookHint"),
-        scope: 'world',
-        config: true,
-        default: '',
-        type: String,
-    });
-
     game.settings.register('tabbed-chatlog', 'icBackupWebhook', {
         name: game.i18n.localize("TC.SETTINGS.IcFallbackWebhookName"),
         hint: game.i18n.localize("TC.SETTINGS.IcFallbackWebhookHint"),
@@ -554,15 +464,6 @@ Hooks.on('init', () => {
         config: true,
         default: '',
         type: String,
-    });
-
-    game.settings.register('tabbed-chatlog', 'icChatInOoc', {
-        name: game.i18n.localize("TC.SETTINGS.IcChatInOocName"),
-        hint: game.i18n.localize("TC.SETTINGS.IcChatInOocHint"),
-        scope: 'world',
-        config: true,
-        default: true,
-        type: Boolean,
     });
 
     game.settings.register('tabbed-chatlog', 'hideInStreamView', {
