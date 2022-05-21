@@ -41,7 +41,7 @@ function isMessageTypeVisible(messageType) {
                 case CONST.CHAT_MESSAGE_TYPES.EMOTE:
                     return true;
                 case CONST.CHAT_MESSAGE_TYPES.WHISPER:
-                    return game.settings.get("tabbed-chatlog", "icWhispers");
+                    return true;
                 case CONST.CHAT_MESSAGE_TYPES.ROLL:
                     return false;
             }
@@ -171,7 +171,7 @@ Hooks.on("renderChatMessage", (chatMessage, html, data) => {
         if ((data.message.type == CONST.CHAT_MESSAGE_TYPES.IC
 		  || data.message.type == CONST.CHAT_MESSAGE_TYPES.OOC
     	  || data.message.type == CONST.CHAT_MESSAGE_TYPES.EMOTE
-		  || (data.message.type == CONST.CHAT_MESSAGE_TYPES.WHISPER && game.settings.get("tabbed-chatlog", "icWhispers"))) && sceneMatches) {
+		  || (data.message.type == CONST.CHAT_MESSAGE_TYPES.WHISPER ) {
             html.css("display", "list-item");
         } else {
             html.css("cssText", "display: none !important;");
@@ -217,8 +217,7 @@ Hooks.on("createChatMessage", (chatMessage, content) => {
         }
     } else if (chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.IC
             || chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.EMOTE
-            || (chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.WHISPER && game.settings.get("tabbed-chatlog", "icWhispers"))) {
-        if (currentTab != "ic" && sceneMatches) {
+            || (chatMessage.data.type == CONST.CHAT_MESSAGE_TYPES.WHISPER ) {
             if (game.settings.get("tabbed-chatlog", "autoNavigate")) {
                 window.game.tabbedchat.tabs.activate("ic", {triggerCallback: true});
             }
@@ -481,15 +480,6 @@ Hooks.on('init', () => {
         scope: 'world',
         config: true,
         default: true,
-        type: Boolean,
-    });
-
-    game.settings.register('tabbed-chatlog', 'icWhispers', {
-        name: game.i18n.localize("TC.SETTINGS.IcWhispersName"),
-        hint: game.i18n.localize("TC.SETTINGS.IcWhispersHint"),
-        scope: 'world',
-        config: true,
-        default: false,
         type: Boolean,
     });
 
