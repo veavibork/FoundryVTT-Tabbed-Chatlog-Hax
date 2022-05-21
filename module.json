@@ -1,5 +1,5 @@
 {
-	"name": "FoundryVTT-Tabbed-Chatlog-Hax-master",
+	"name": "tabhax",
 	"title": "Tabbed Chatlog Hax",
 	"description": "Splits the Chatlog into GET THE HELL OUT OF HERE JC",
 	"version": "1.0.0",
@@ -7,7 +7,7 @@
 	"compatibleCoreVersion": "9",
 	"author": "Veav but actually Cody Swendrowski <cody@swendrowski.us>",
 	"esmodules": [
-		"./tabbed-chatlog.js"
+		"./scripts/tabbed-chatlog.js"
 	],
 	"scripts": [],
 	"styles": [
