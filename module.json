@@ -2,7 +2,7 @@
 	"name": "tabbed-chatlog-hax",
 	"title": "Tabbed Chatlog Hax",
 	"description": "Splits the Chatlog into GET THE HELL OUT OF HERE JC",
-	"version": "1.6.4",
+	"version": "1.0.0",
 	"minimumCoreVersion": "0.8.0",
 	"compatibleCoreVersion": "9",
 	"author": "Veav but actually Cody Swendrowski <cody@swendrowski.us>",
@@ -47,5 +47,5 @@
 	],
 	"url": "https://github.com/veavibork/FoundryVTT-Tabbed-Chatlog-Hax",
 	"manifest": "https://github.com/veavibork/FoundryVTT-Tabbed-Chatlog-Hax/releases/download/latest/module.json",
-	"download": "https://github.com/veavibork/FoundryVTT-Tabbed-Chatlog-Hax/releases/download/1.6.4/module.zip"
+	"download": "https://github.com/veavibork/FoundryVTT-Tabbed-Chatlog-Hax/releases/download/1.0.0/module.zip"
 }
